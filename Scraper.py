@@ -4,7 +4,8 @@ import time
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 
-URL='http://techcrunch.com'
+URL = 'https://techcrunch.com/
+
 
 class Scraper:
     def __init__(self, url):
