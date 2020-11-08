@@ -5,6 +5,7 @@ Web scraper for TechCrunch. Scrapes main page and accesses all articles, printin
 
 ## Requirements & Installations
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install required packages. 
+Install [chromedriver](https://chromedriver.chromium.org/downloads) 
 
 ``` python
 pip install bs4
@@ -15,7 +16,7 @@ pip install time
 ## Instructions & Usage
  Clone repository  
 
- Install [chromedriver](https://chromedriver.chromium.org/downloads) and import it into your project folder
+ Unzip installed chromedriver and insert it into your project folder
  
  Run 
  ``` python
