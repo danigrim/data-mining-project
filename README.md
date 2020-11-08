@@ -1,8 +1,23 @@
-# TechCrunch Web Scraper - Checkpoint #1 
+# TechCrunch Web Scraper
 
 ## Description
-This program scrapes TechCrunch articles and prints out their title, date published and the tags associated with the article. 
- The web scraper is able to query the data source and print the collected data to the screen.
+Web scraper for TechCrunch. Scrapes main page and accesses all articles, printing out their title, date published and the tags associated with the article.
 
-## Requirements
-This project will be using Selenium library to run the first get (request) to obtain all condo links, and then extract info elements using BeautifulSoup package.
+## Requirements & Installations
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install required packages. 
+
+``` python
+pip install bs4
+pip install selenium
+pip install time
+```
+
+## Instructions & Usage
+ Clone repository  
+
+ Install [chromedriver](https://chromedriver.chromium.org/downloads) and import it into your project folder
+ 
+ Run 
+ ``` python
+python3 Scraper.py
+```
