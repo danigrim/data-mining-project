@@ -4,14 +4,15 @@ import time
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
-from config import URL,CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, LOAD_MORE_BUTTON_XPATH,\
+from config import URL, CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, LOAD_MORE_BUTTON_XPATH, \
     TAGS_CLASS, ARTICLE_TAG, LINK_TAG, PARSER, LIST_ITEM
 
-class Scraper:
 
+class Scraper:
     """
     Scraper class used to scrape techcrunch
     """
+
     def __init__(self, url):
         """
         Scraper initializer
@@ -31,18 +32,17 @@ class Scraper:
         articles = set()
         load_button = True
         while load_button:
-            soup = BeautifulSoup(driver.page_source, PARSER)  #re initialize beautiful soup after load more pressed
-            #finds articles in featured category
+            soup = BeautifulSoup(driver.page_source, PARSER)  # re initialize beautiful soup after load more pressed
+            # finds articles in featured category
             all_articles = [a.findChildren(ARTICLE_TAG)[0] for a in soup.find_all(TAG_FEATURED_ARTICLES,
-                                                                          class_=CLASS_FEATURED_ARTICLES)]
-            #finds articles in 'latest' category
+                                                                                  class_=CLASS_FEATURED_ARTICLES)]
+            # finds articles in 'latest' category
             all_articles.extend(soup.find_all(href=True, class_=CLASS_LATEST_ARTICLES))
             for a in all_articles:
                 if a[LINK_TAG] not in articles:
                     self.get_article_info(a[LINK_TAG], driver)
                     articles.add(a[LINK_TAG])
             load_button = self.load_more_posts(driver)
-
 
     def load_more_posts(self, driver):
         """
@@ -53,13 +53,13 @@ class Scraper:
         try:
             load_more_button = driver.find_element_by_xpath(LOAD_MORE_BUTTON_XPATH)
         except NoSuchElementException as e:
+            print(e)
             return False
         action = ActionChains(driver)
         action.move_to_element(load_more_button).click().perform()
         print("Loading more posts...")
         time.sleep(3)
         return True
-
 
     def get_article_info(self, article, driver):
         """
@@ -68,7 +68,8 @@ class Scraper:
         """
         driver.get(self.url + article)
         soup = BeautifulSoup(driver.page_source, PARSER)
-        date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[1] #Find date and title of article from URL
+        date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[
+            1]  # Find date and title of article from URL
         # twitter = soup.find(class_="article__byline__meta")
         # twitter_handle = twitter.findChildren(ARTICLE_TAG)[LINK_TAG] if twitter else ""
         # print(twitter_handle)
@@ -78,13 +79,14 @@ class Scraper:
             for li in list(menu_items.children):
                 tag_list.append(list(li.children)[0].get_text())
         print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Twitter Handle:", "\n")
-        driver.back() #Move back to main page
+        driver.back()  # Move back to main page
 
 
 class Article:
     """
     Class for tech-crunch article
     """
+
     def __init__(self, title, date, tag_list):
         """
         Article initializer
