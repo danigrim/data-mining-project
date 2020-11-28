@@ -1,12 +1,15 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
-
+import sqlalchemy
+from datetime import datetime
+from utils import get_url
 from selenium.common.exceptions import NoSuchElementException, WebDriverException, NoSuchWindowException
 import sys
 from selenium.webdriver.common.action_chains import ActionChains
+from Article import Article
 from config import URL, CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, LOAD_MORE_BUTTON_XPATH, \
-    TAGS_CLASS, ARTICLE_TAG, LINK_TAG, PARSER, LIST_ITEM, TWITTER_HANDLE_CLASS, LOADING_TIME
+    TAGS_CLASS, ARTICLE_TAG, LINK_TAG, PARSER, LIST_ITEM, TWITTER_HANDLE_CLASS, LOADING_TIME, AUTHOR_TAG
 
 
 def load_more_posts(driver):
@@ -32,7 +35,8 @@ class Scraper:
     Scraper class used to scrape techcrunch
     """
     url = URL
-    def __init__(self, tags, authors, months, display, today):
+
+    def __init__(self, tags, authors, months, display, today, limit):
         """
         Scraper initializer
         """
@@ -41,6 +45,7 @@ class Scraper:
         self.months = months
         self.display = display
         self.today = today
+        self.limit = limit
 
     def scrape(self):
         """
@@ -48,13 +53,8 @@ class Scraper:
         While there are more articles to load, navigates to each article, scraping  for tags, date, and title
         Presses load more button
         """
-        try:
-            driver = webdriver.Chrome('./chromedriver')
-            driver.get(self.url)
-        except WebDriverException as e:
-            print("Error: Chrome not reachable. Exiting the program.", e)
-            sys.exit(1)
-
+        driver = webdriver.Chrome('./chromedriver')
+        get_url(self.url, driver)
         articles = set()
         load_button = True
         while load_button:
@@ -64,52 +64,56 @@ class Scraper:
                                                                                   class_=CLASS_FEATURED_ARTICLES)]
             # finds articles in 'latest' category
             all_articles.extend(soup.find_all(href=True, class_=CLASS_LATEST_ARTICLES))
+            articles_scraped = 0
             for a in all_articles:
                 if a[LINK_TAG] not in articles:
-                    self.get_article_info(a[LINK_TAG], driver)
+                    articles_scraped += self.get_article_info(a[LINK_TAG], driver)
+                    if self.limit and articles_scraped >= self.limit:
+                        print("All done... ", self.limit, " articles scraped")
+                        sys.exit(0)
                     articles.add(a[LINK_TAG])
             load_button = load_more_posts(driver)
+
+    def article_satisfies_options(self, date, author_name, tag_list):
+        if self.authors != "all":
+            if author_name.lower() not in self.authors:
+                return False
+        if self.today:
+            if datetime.today().strftime("%Y/%m/%d") != date:
+                return False
+        if self.months != "all":
+            if date.split("/")[1].strip("0") not in list(map(lambda m: str(m).strip("0"), self.months)):
+                return False
+        if self.tags != "all":
+            if not set(tag_list) & set(self.tags):
+                return False
+        return True
 
     def get_article_info(self, article, driver):
         """
         Function prints the relevant info about each article.
         :param: article : url to relevant article, driver: chrome driver
         """
-        driver.get(self.url + article)
-        soup = BeautifulSoup(driver.page_source, PARSER)
-        date, title = "", ""
-        try:
-            date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[1]  # Find date and title of article
-            # from URL
-        except IndexError as e:
-            print("Error: Unrecognized format for article date and title", e)
-        finally:
-            twitter = soup.find(class_=TWITTER_HANDLE_CLASS)
-            twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter and twitter.findChildren \
-                (ARTICLE_TAG) else "No Twitter account"
-            author = soup.find(class_="article__byline")
-            author_name = author.findChildren(ARTICLE_TAG)[0].get_text() if author.findChildren(ARTICLE_TAG) else ""
-            menu_items = soup.find(LIST_ITEM, class_=TAGS_CLASS)
-            tag_list = []
-            if menu_items:
-                for li in list(menu_items.children):
-                    tag_list.append(list(li.children)[0].get_text())
-            print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Author Name:", author_name, "Twitter Handle:",
-                  twitter_handle, "\n")
-            driver.back()  # Move back to main page
+        article = Article(self.url, article)
+        date, title, twitter_handle, author_name, tag_list = article.scrape(driver)
+        if not self.article_satisfies_options(date, author_name, tag_list):
+            return 0
+        self.print_article_info(title, date, tag_list, author_name, twitter_handle)
+        return 1
 
-
-class Article:
-    """
-    Class for tech-crunch article
-    """
-
-    def __init__(self, title, date, tag_list, author_name):
+    def print_article_info(self,title, date, tags_list, author, twitter):
         """
-        Article initializer
-        :param title, date and tag list of article
+        Function prints article information according to scraper settings of display
+        :param title: article title
+        :param date: article date YYYY/MM/DD
+        :param tag_list: tags list of article
+        :param author_name: author name
+        :param twitter_handle: twitter handle link
+        :return: None
         """
-        self.title = title
-        self.date = date
-        self.tag_list = tag_list
-        self.author_name = author_name
+        if self.display == "all":
+            print("Title:", title, "Date:", date, "Tag_list:", tags_list, "Author Name:", author, "Twitter Handle:",
+              twitter, "\n")
+        else:
+            article_info = {"title": title, "date": date, "tags": tags_list, "author": author, "twitter": twitter}
+            print(" ".join(str(choice + ": " + str(article_info[choice])) for choice in self.display if choice in article_info))
