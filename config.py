@@ -9,3 +9,5 @@ LINK_TAG = 'href'
 PARSER = 'html.parser'
 LIST_ITEM = 'ul'
 TWITTER_HANDLE_CLASS = "article__byline__meta"
+DISPLAY_OPTIONS = ["all", "tags", "title", "date", "author", "twitter"]
+LOADING_TIME = 3

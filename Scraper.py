@@ -7,20 +7,41 @@ from selenium.common.exceptions import NoSuchElementException, WebDriverExceptio
 import sys
 from selenium.webdriver.common.action_chains import ActionChains
 from config import URL, CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, LOAD_MORE_BUTTON_XPATH, \
-    TAGS_CLASS, ARTICLE_TAG, LINK_TAG, PARSER, LIST_ITEM, TWITTER_HANDLE_CLASS
+    TAGS_CLASS, ARTICLE_TAG, LINK_TAG, PARSER, LIST_ITEM, TWITTER_HANDLE_CLASS, LOADING_TIME
+
+
+def load_more_posts(driver):
+    """
+    Function loads more posts as long as there is still a load more button.
+    :param driver: Chrome driver
+    :return: True if load more button found, False otherwise
+    """
+    try:
+        load_more_button = driver.find_element_by_xpath(LOAD_MORE_BUTTON_XPATH)
+    except NoSuchElementException as e:
+        print("Error: Load more button not found", e)
+        return False
+    action = ActionChains(driver)
+    action.move_to_element(load_more_button).click().perform()
+    print("Loading more posts...")
+    time.sleep(LOADING_TIME)
+    return True
 
 
 class Scraper:
     """
     Scraper class used to scrape techcrunch
     """
-
-    def __init__(self, url):
+    url = URL
+    def __init__(self, tags, authors, months, display, today):
         """
         Scraper initializer
-        :param url: url to website
         """
-        self.url = url
+        self.tags = tags
+        self.authors = authors
+        self.months = months
+        self.display = display
+        self.today = today
 
     def scrape(self):
         """
@@ -48,24 +69,7 @@ class Scraper:
                 if a[LINK_TAG] not in articles:
                     self.get_article_info(a[LINK_TAG], driver)
                     articles.add(a[LINK_TAG])
-            load_button = self.load_more_posts(driver)
-
-    def load_more_posts(self, driver):
-        """
-        Function loads more posts as long as there is still a load more button.
-        :param driver: Chrome driver
-        :return: True if load more button found, False otherwise
-        """
-        try:
-            load_more_button = driver.find_element_by_xpath(LOAD_MORE_BUTTON_XPATH)
-        except NoSuchElementException as e:
-            print("Error: Load more button not found", e)
-            return False
-        action = ActionChains(driver)
-        action.move_to_element(load_more_button).click().perform()
-        print("Loading more posts...")
-        time.sleep(3)
-        return True
+            load_button = load_more_posts(driver)
 
     def get_article_info(self, article, driver):
         """
@@ -74,14 +78,16 @@ class Scraper:
         """
         driver.get(self.url + article)
         soup = BeautifulSoup(driver.page_source, PARSER)
+        date, title = "", ""
         try:
-            date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[1] #Find date and title of article from URL
+            date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[1]  # Find date and title of article
+            # from URL
         except IndexError as e:
-            print("Error: Unreccognized format for article date and title", e)
-            date, title = "", ""
+            print("Error: Unrecognized format for article date and title", e)
         finally:
             twitter = soup.find(class_=TWITTER_HANDLE_CLASS)
-            twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter.findChildren(ARTICLE_TAG) else ""
+            twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter and twitter.findChildren \
+                (ARTICLE_TAG) else "No Twitter account"
             author = soup.find(class_="article__byline")
             author_name = author.findChildren(ARTICLE_TAG)[0].get_text() if author.findChildren(ARTICLE_TAG) else ""
             menu_items = soup.find(LIST_ITEM, class_=TAGS_CLASS)
@@ -89,7 +95,6 @@ class Scraper:
             if menu_items:
                 for li in list(menu_items.children):
                     tag_list.append(list(li.children)[0].get_text())
-
             print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Author Name:", author_name, "Twitter Handle:",
                   twitter_handle, "\n")
             driver.back() #Move back to main page
@@ -117,3 +122,4 @@ if __name__ == '__main__':
         tcScraper.scrape()
     except NoSuchWindowException as e:
         print("Error: Window not found. Make sure scraping browser was not closed", e)
+
