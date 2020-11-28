@@ -69,15 +69,14 @@ class Scraper:
         driver.get(self.url + article)
         soup = BeautifulSoup(driver.page_source, PARSER)
         date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[1] #Find date and title of article from URL
-        # twitter = soup.find(class_="article__byline__meta")
-        # twitter_handle = twitter.findChildren(ARTICLE_TAG)[LINK_TAG] if twitter else ""
-        # print(twitter_handle)
+        twitter = soup.find(class_="article__byline__meta")
+        twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter.findChildren(ARTICLE_TAG) else ""
         menu_items = soup.find(LIST_ITEM, class_=TAGS_CLASS)
         tag_list = []
         if menu_items:
             for li in list(menu_items.children):
                 tag_list.append(list(li.children)[0].get_text())
-        print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Twitter Handle:", "\n")
+        print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Twitter Handle:", twitter_handle, "\n")
         driver.back() #Move back to main page
 
 
