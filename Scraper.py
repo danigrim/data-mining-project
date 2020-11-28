@@ -4,13 +4,8 @@ import time
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
-
-URL = 'https://techcrunch.com/'
-CLASS_FEATURED_ARTICLES = 'mini-view__item__title'
-TAG_FEATURED_ARTICLES = 'h3'
-CLASS_LATEST_ARTICLES = 'post-block__title__link'
-LOAD_MORE_BUTTON_XPATH = '//*[@id="tc-main-content"]/div[2]/div/div/button/span'
-TAGS_CLASS = 'menu article__tags__menu'
+from config import URL,CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, LOAD_MORE_BUTTON_XPATH,\
+    TAGS_CLASS, ARTICLE_TAG, LINK_TAG, PARSER, LIST_ITEM
 
 class Scraper:
 
@@ -36,15 +31,16 @@ class Scraper:
         articles = set()
         load_button = True
         while load_button:
-            soup = BeautifulSoup(driver.page_source, 'html.parser') #re initialize beautiful soup after load more pressed
+            soup = BeautifulSoup(driver.page_source, PARSER)  #re initialize beautiful soup after load more pressed
             #finds articles in featured category
-            all_articles = [a.findChildren('a')[0] for a in soup.find_all(TAG_FEATURED_ARTICLES, class_=CLASS_FEATURED_ARTICLES)]
+            all_articles = [a.findChildren(ARTICLE_TAG)[0] for a in soup.find_all(TAG_FEATURED_ARTICLES,
+                                                                          class_=CLASS_FEATURED_ARTICLES)]
             #finds articles in 'latest' category
             all_articles.extend(soup.find_all(href=True, class_=CLASS_LATEST_ARTICLES))
             for a in all_articles:
-                if a['href'] not in articles:
-                    self.get_article_info(a['href'], driver)
-                    articles.add(a['href'])
+                if a[LINK_TAG] not in articles:
+                    self.get_article_info(a[LINK_TAG], driver)
+                    articles.add(a[LINK_TAG])
             load_button = self.load_more_posts(driver)
 
 
@@ -71,15 +67,32 @@ class Scraper:
         :param: article : url to relevant article, driver: chrome driver
         """
         driver.get(self.url + article)
-        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        soup = BeautifulSoup(driver.page_source, PARSER)
         date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[1] #Find date and title of article from URL
-        menu_items = soup.find('ul', class_=TAGS_CLASS)
+        # twitter = soup.find(class_="article__byline__meta")
+        # twitter_handle = twitter.findChildren(ARTICLE_TAG)[LINK_TAG] if twitter else ""
+        # print(twitter_handle)
+        menu_items = soup.find(LIST_ITEM, class_=TAGS_CLASS)
         tag_list = []
         if menu_items:
             for li in list(menu_items.children):
                 tag_list.append(list(li.children)[0].get_text())
-        print("Title:", title, "Date:", date, "Tag_list:", tag_list, "\n")
+        print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Twitter Handle:", "\n")
         driver.back() #Move back to main page
+
+
+class Article:
+    """
+    Class for tech-crunch article
+    """
+    def __init__(self, title, date, tag_list):
+        """
+        Article initializer
+        :param title, date and tag list of article
+        """
+        self.title = title
+        self.date = date
+        self.tag_list = tag_list
 
 
 if __name__ == '__main__':
