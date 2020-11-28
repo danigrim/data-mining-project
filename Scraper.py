@@ -89,7 +89,7 @@ class Article:
     Class for tech-crunch article
     """
 
-    def __init__(self, title, date, tag_list):
+    def __init__(self, title, date, tag_list, author_name):
         """
         Article initializer
         :param title, date and tag list of article
@@ -97,6 +97,7 @@ class Article:
         self.title = title
         self.date = date
         self.tag_list = tag_list
+        self.author_name = author_name
 
 
 if __name__ == '__main__':
