@@ -74,7 +74,6 @@ class Scraper:
         twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter.findChildren(ARTICLE_TAG) else ""
         author = soup.find(class_="article__byline")
         author_name = author.findChildren(ARTICLE_TAG)[0].get_text() if author.findChildren(ARTICLE_TAG) else ""
-        print(author_name)
         menu_items = soup.find(LIST_ITEM, class_=TAGS_CLASS)
         tag_list = []
         if menu_items:
@@ -98,7 +97,6 @@ class Article:
         self.title = title
         self.date = date
         self.tag_list = tag_list
-
 
 
 if __name__ == '__main__':
