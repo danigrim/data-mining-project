@@ -7,9 +7,9 @@ from Scraper import Scraper
 
 def validate_format(ctx, param, value):
     try:
-        selections = value.split(",") if value != ("all") else value
-        if param.name == "authors":
-            selections = list(map(lambda n: n.replace("_", " "), selections))
+        selections = value.lower().split(",") if value != ("all") else value
+        if param.name == "authors" and value != ("all"):
+            selections = list(map(lambda n: n.lower().replace("_", " "), selections))
         elif param.name == "months" and value != ("all"):
             for selection in selections:
                 if not selection.isdigit() or int(selection) > 12 or int(selection) < 1: raise ValueError("Month "
@@ -59,8 +59,10 @@ def main(tags, authors, months, display, today, limit):
     print_params = tuple(
         map(lambda p: ', '.join(p) if isinstance(p, tuple) else p, (tags, authors, months, today, display, str(limit))))
     click.echo(f"Initalizing Techcrunch Webscraper... Currently scraping for: %s tags, %s authors, months number %s . "
-               f"\nScraping only today's articles: %s.\nWill display %s information for articles\n Article limit: %s" % print_params)
-    tc_scraper = Scraper(tags, authors, months, display, today)
+               f"\nScraping only today's articles: %s.\nWill display %s information for articles\nArticle limit: %s" % print_params)
+
+    tc_scraper = Scraper(tags, authors, months, display, today, limit)
+
     try:
         tc_scraper.scrape()
     except NoSuchWindowException as e:
