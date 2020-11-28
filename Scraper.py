@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
+import sqlalchemy
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
@@ -71,14 +72,17 @@ class Scraper:
         date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[1] #Find date and title of article from URL
         twitter = soup.find(class_="article__byline__meta")
         twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter.findChildren(ARTICLE_TAG) else ""
+        author = soup.find(class_="article__byline")
+        author_name = author.findChildren(ARTICLE_TAG)[0].get_text() if author.findChildren(ARTICLE_TAG) else ""
+        print(author_name)
         menu_items = soup.find(LIST_ITEM, class_=TAGS_CLASS)
         tag_list = []
         if menu_items:
             for li in list(menu_items.children):
                 tag_list.append(list(li.children)[0].get_text())
-
-        print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Twitter Handle:", twitter_handle, "\n")
-        driver.back() #Move back to main page
+        print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Author Name:", author_name, "Twitter Handle:",
+              twitter_handle, "\n")
+        driver.back() # Move back to main page
 
 
 class Article:
@@ -94,6 +98,7 @@ class Article:
         self.title = title
         self.date = date
         self.tag_list = tag_list
+
 
 
 if __name__ == '__main__':
