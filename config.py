@@ -13,7 +13,7 @@ AUTHOR_TAG = "article__byline"
 
 #Scraper configurations
 DISPLAY_OPTIONS = ["all", "tags", "title", "date", "author", "twitter"]
-LOADING_TIME = 3
+LOADING_TIME = 5
 URL = 'https://techcrunch.com/'
 
 #Database configurations

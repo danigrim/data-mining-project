@@ -1,5 +1,4 @@
 import click
-import re
 from selenium.common.exceptions import NoSuchElementException, WebDriverException, NoSuchWindowException
 from config import URL, DISPLAY_OPTIONS
 from Scraper import Scraper

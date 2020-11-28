@@ -1,10 +1,10 @@
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
-import sqlalchemy
 from datetime import datetime
 from utils import get_url
-from selenium.common.exceptions import NoSuchElementException, WebDriverException, NoSuchWindowException
+from database_utils import insert_article_entry
+from selenium.common.exceptions import NoSuchElementException
 import sys
 from selenium.webdriver.common.action_chains import ActionChains
 from Article import Article
@@ -93,10 +93,11 @@ class Scraper:
         Function prints the relevant info about each article.
         :param: article : url to relevant article, driver: chrome driver
         """
-        article = Article(self.url, article)
-        date, title, twitter_handle, author_name, tag_list = article.scrape(driver)
+        article_entity = Article(self.url, article)
+        date, title, twitter_handle, author_name, tag_list = article_entity.scrape(driver)
         if not self.article_satisfies_options(date, author_name, tag_list):
             return 0
+        insert_article_entry(author_name, twitter_handle, tag_list, title, date, (self.url + article))
         self.print_article_info(title, date, tag_list, author_name, twitter_handle)
         return 1
 

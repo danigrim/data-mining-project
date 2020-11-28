@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-from selenium import webdriver
 from utils import get_url
 from config import TAGS_CLASS, ARTICLE_TAG, PARSER, LINK_TAG, LIST_ITEM, TWITTER_HANDLE_CLASS, AUTHOR_TAG
 
