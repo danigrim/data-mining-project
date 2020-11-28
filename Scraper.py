@@ -2,10 +2,11 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
 
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, WebDriverException, NoSuchWindowException
+import sys
 from selenium.webdriver.common.action_chains import ActionChains
 from config import URL, CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, LOAD_MORE_BUTTON_XPATH, \
-    TAGS_CLASS, ARTICLE_TAG, LINK_TAG, PARSER, LIST_ITEM
+    TAGS_CLASS, ARTICLE_TAG, LINK_TAG, PARSER, LIST_ITEM, TWITTER_HANDLE_CLASS
 
 
 class Scraper:
@@ -26,8 +27,12 @@ class Scraper:
         While there are more articles to load, navigates to each article, scraping  for tags, date, and title
         Presses load more button
         """
-        driver = webdriver.Chrome('./chromedriver')
-        driver.get(self.url)
+        try:
+            driver = webdriver.Chrome('./chromedriver')
+            driver.get(self.url)
+        except WebDriverException as e:
+            print("Error: Chrome not reachable. Exiting the program.", e)
+            sys.exit(1)
 
         articles = set()
         load_button = True
@@ -53,7 +58,7 @@ class Scraper:
         try:
             load_more_button = driver.find_element_by_xpath(LOAD_MORE_BUTTON_XPATH)
         except NoSuchElementException as e:
-            print(e)
+            print("Error: Load more button not found", e)
             return False
         action = ActionChains(driver)
         action.move_to_element(load_more_button).click().perform()
@@ -68,18 +73,23 @@ class Scraper:
         """
         driver.get(self.url + article)
         soup = BeautifulSoup(driver.page_source, PARSER)
-        date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[1]  # Find date and title of article from
-        # URL
-        twitter = soup.find(class_="article__byline__meta")
-        twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter.findChildren(ARTICLE_TAG) else ""
-        menu_items = soup.find(LIST_ITEM, class_=TAGS_CLASS)
-        tag_list = []
-        if menu_items:
-            for li in list(menu_items.children):
-                tag_list.append(list(li.children)[0].get_text())
 
-        print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Twitter Handle:", twitter_handle, "\n")
-        driver.back()  # Move back to main page
+        try:
+            date, title = article.rsplit('/', 2)[0][1:], article.rsplit('/', 2)[1] #Find date and title of article from URL
+        except IndexError as e:
+            print("Error: Unreccognized format for article date and title", e)
+            date, title = "", ""
+        finally:
+            twitter = soup.find(class_=TWITTER_HANDLE_CLASS)
+            twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter.findChildren(ARTICLE_TAG) else ""
+            menu_items = soup.find(LIST_ITEM, class_=TAGS_CLASS)
+            tag_list = []
+            if menu_items:
+                for li in list(menu_items.children):
+                    tag_list.append(list(li.children)[0].get_text())
+
+            print("Title:", title, "Date:", date, "Tag_list:", tag_list, "Twitter Handle:", twitter_handle, "\n")
+            driver.back() #Move back to main page
 
 
 class Article:
@@ -99,4 +109,7 @@ class Article:
 
 if __name__ == '__main__':
     tcScraper = Scraper(URL)
-    tcScraper.scrape()
+    try:
+        tcScraper.scrape()
+    except NoSuchWindowException as e:
+        print("Error: Window not found. Make sure scraping browser was not closed", e)

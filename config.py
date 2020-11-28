@@ -8,3 +8,4 @@ ARTICLE_TAG = 'a'
 LINK_TAG = 'href'
 PARSER = 'html.parser'
 LIST_ITEM = 'ul'
+TWITTER_HANDLE_CLASS = "article__byline__meta"
