@@ -1,4 +1,4 @@
-URL = 'https://techcrunch.com/'
+#Tags and Classes for Scraper
 CLASS_FEATURED_ARTICLES = 'mini-view__item__title'
 TAG_FEATURED_ARTICLES = 'h3'
 CLASS_LATEST_ARTICLES = 'post-block__title__link'
@@ -9,6 +9,15 @@ LINK_TAG = 'href'
 PARSER = 'html.parser'
 LIST_ITEM = 'ul'
 TWITTER_HANDLE_CLASS = "article__byline__meta"
+AUTHOR_TAG = "article__byline"
+
+#Scraper configurations
 DISPLAY_OPTIONS = ["all", "tags", "title", "date", "author", "twitter"]
 LOADING_TIME = 3
-AUTHOR_TAG="article__byline"
+URL = 'https://techcrunch.com/'
+
+#Database configurations
+HOST = 'localhost'
+DATABASE = 'techcrunch_cp_2'
+USER = 'root'
+PASSWORD = 'newpass'

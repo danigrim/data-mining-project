@@ -1,11 +1,12 @@
 import mysql.connector
 from mysql.connector import Error
+from config import HOST, DATABASE, USER, PASSWORD
 
 try:
-    connection = mysql.connector.connect(host='localhost',
-                                             database='techcrunch_cp_2',
-                                             user='root',
-                                             password= 'newpass')
+    connection = mysql.connector.connect(host=HOST,
+                                             database=DATABASE,
+                                             user=USER,
+                                             password=PASSWORD)
     cursor = connection.cursor()
     cursor.execute( """CREATE TABLE authors (
             author_id INT NOT NULL AUTO_INCREMENT,
