@@ -3,11 +3,25 @@ File initializes database tables given configuration parameters
 Authors: Edward Mattout & Daniella Grimberg
 """
 
-
 import mysql.connector
-from mysql.connector import Error
-from database_utils import connect_to_database, close_database_connection
+from database_utils import connect_to_database, close_database_connection, LOG_FILE_FORMAT, LOG_FILE_NAME
+import sys
+import logging
 
+formatter = logging.Formatter(LOG_FILE_FORMAT)
+
+logger = logging.getLogger('database_init')
+logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler(LOG_FILE_NAME)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setLevel(logging.ERROR)
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
 
 def make_tables():
     """
@@ -52,9 +66,9 @@ def make_tables():
                     FOREIGN KEY (author_id) REFERENCES authors(author_id),
                     PRIMARY KEY (id)
                     )""");
+        logger.info("Succesfully created tables in database")
     except mysql.connector.Error as error:
-            print("Failed to create table in MySQL: {}".format(error))
-
+        logger.error("Failed to create table in MySQL: {}".format(error))
     finally:
         close_database_connection(connection, cursor)
 

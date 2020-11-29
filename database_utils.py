@@ -5,9 +5,7 @@ Authors: Edward Mattout & Daniella Grimberg
 
 from config import HOST, DATABASE, USER, PASSWORD, LOG_FILE_FORMAT, LOG_FILE_NAME
 import mysql.connector
-from mysql.connector import Error
 import sys
-
 import logging
 
 formatter = logging.Formatter(LOG_FILE_FORMAT)
