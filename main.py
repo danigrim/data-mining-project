@@ -55,6 +55,16 @@ def validate_format(ctx, param, value):
                                                       '--limit=250')
 
 def main(tags, authors, months, display, today, limit):
+    """
+    Main function used to take in user arguments (scraping preferences) and initialize the scraper
+    :param tags:user list of tags to scrape for
+    :param authors: user list of authors looking for
+    :param months: user list of months by index ex january and february 1,2
+    :param display: user list of preferences for what will be displayed
+    :param today: Boolean to indicate if to only scrape todays articles
+    :param limit: (int) limit of iterations
+    :return:
+    """
     print_params = tuple(
         map(lambda p: ', '.join(p) if isinstance(p, tuple) else p, (tags, authors, months, today, display, str(limit))))
     click.echo(f"Initalizing Techcrunch Webscraper... Currently scraping for: %s tags, %s authors, months number %s . "
