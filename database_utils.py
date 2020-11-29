@@ -21,7 +21,7 @@ def connect_to_database():
 def close_database_connection(connection, cursor):
     """
     Function closes connection to database
-    :return:
+    :return: None
     """
     if connection.is_connected():
         cursor.close()
@@ -30,12 +30,12 @@ def close_database_connection(connection, cursor):
 
 def insert_author(connection, cursor, author_name, twitter_handle):
     """
-
-    :param connection:
-    :param cursor:
-    :param author_name:
-    :param twitter_handle:
-    :return:
+    Function inserts data into authors table
+    :param connection: connection to database
+    :param cursor: cursor
+    :param author_name: full name of authors
+    :param twitter_handle: twitter handle of author
+    :return: author_id
     """
     try:
         cursor.execute("""INSERT IGNORE INTO authors (full_name, twitter_handle)
@@ -52,13 +52,13 @@ def insert_author(connection, cursor, author_name, twitter_handle):
 
 def insert_article(connection, cursor, link, title, date):
     """
-
-    :param connection:
-    :param cursor:
-    :param link:
-    :param title:
-    :param date:
-    :return:
+    Function inserts article to articles table
+    :param connection: connection to database
+    :param cursor: cursor to execute sql queries
+    :param link: link of article
+    :param title: title of article
+    :param date: publish data of article
+    :return: article_id
     """
     try:
         cursor.execute("""INSERT IGNORE INTO articles (link, title, date) 
@@ -75,12 +75,12 @@ def insert_article(connection, cursor, link, title, date):
 
 def insert_tag(connection, cursor, tag, article_id):
     """
-
-    :param connection:
-    :param cursor:
-    :param tag:
-    :param article_id:
-    :return:
+    Function inserts tags of article to tags table
+    :param connection: connection to database
+    :param cursor: cursor to execute sql queries
+    :param tag: tag of article
+    :param article_id: article_id
+    :return: None
     """
     try:
         cursor.execute("""INSERT IGNORE INTO tags (tag_text) VALUES (%s)""", (tag,))
@@ -117,7 +117,7 @@ def insert_article_author_relation(connection, cursor, article_id, author_id):
         print("Failed to insert into table ARTICLE_TO_AUTHORS {}".format(error))
 
 
-def insert_article_entry(author_name, twitter_handle, tag_list, title, date ,link):
+def insert_article_entry(author_name, twitter_handle, tag_list, title, date, link):
     """
     Function inserts article information into database
     :param author_name: name of author
@@ -126,7 +126,6 @@ def insert_article_entry(author_name, twitter_handle, tag_list, title, date ,lin
     :param title: title of article
     :return: None
     """
-
     connection, cursor = connect_to_database()
     author_id = insert_author(connection, cursor, author_name, twitter_handle)
     article_id = insert_article(connection, cursor, link, title, date)
