@@ -1,3 +1,8 @@
+"""
+File for utility functions
+Authors: Edward Mattout & Daniella Grimberg
+"""
+
 from selenium.common.exceptions import WebDriverException
 import sys
 

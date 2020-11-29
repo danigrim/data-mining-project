@@ -12,7 +12,7 @@ TWITTER_HANDLE_CLASS = "article__byline__meta"
 AUTHOR_TAG = "article__byline"
 
 #Scraper configurations
-DISPLAY_OPTIONS = ["all", "tags", "title", "date", "author", "twitter"]
+DISPLAY_OPTIONS = ["all", "tags", "title", "date", "author", "twitter", "count"]
 LOADING_TIME = 5
 URL = 'https://techcrunch.com/'
 

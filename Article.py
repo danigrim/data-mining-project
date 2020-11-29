@@ -72,9 +72,7 @@ class Article:
         """
         date, title = "", ""
         try:
-            date, title = self.title.rsplit('/', 2)[0][1:], self.title.rsplit('/', 2)[
-                1]  # Find date and title of article
-            # from URL
+            date, title = self.title.rsplit('/', 2)[0][1:], self.title.rsplit('/', 2)[1]
         except IndexError as e:
             print("Error: Unrecognized format for article date and title", e)
         finally:

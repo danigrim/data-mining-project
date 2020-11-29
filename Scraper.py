@@ -1,3 +1,8 @@
+"""
+File for Scraper class and its functions
+Authors: Edward Mattout & Daniella Grimberg
+"""
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
@@ -8,7 +13,8 @@ from selenium.common.exceptions import NoSuchElementException
 import sys
 from selenium.webdriver.common.action_chains import ActionChains
 from Article import Article
-from config import URL, ARTICLE_TAG, LINK_TAG, CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, LOAD_MORE_BUTTON_XPATH,  PARSER,  LOADING_TIME
+from config import URL, ARTICLE_TAG, LINK_TAG, CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, \
+    LOAD_MORE_BUTTON_XPATH, PARSER, LOADING_TIME
 
 
 def load_more_posts(driver):
@@ -66,7 +72,7 @@ class Scraper:
             articles_scraped = 0
             for a in all_articles:
                 if a[LINK_TAG] not in articles:
-                    articles_scraped += self.get_article_info(a[LINK_TAG], driver)
+                    articles_scraped += self.get_article_info(a[LINK_TAG], driver, articles_scraped)
                     if self.limit and articles_scraped >= self.limit:
                         print("All done... ", self.limit, " articles scraped")
                         sys.exit(0)
@@ -88,7 +94,7 @@ class Scraper:
                 return False
         return True
 
-    def get_article_info(self, article, driver):
+    def get_article_info(self, article, driver, count):
         """
         Function prints the relevant info about each article.
         :param: article : url to relevant article, driver: chrome driver
@@ -98,10 +104,10 @@ class Scraper:
         if not self.article_satisfies_options(date, author_name, tag_list):
             return 0
         insert_article_entry(author_name, twitter_handle, tag_list, title, date, (self.url + article))
-        self.print_article_info(title, date, tag_list, author_name, twitter_handle)
+        self.print_article_info(title, date, tag_list, author_name, twitter_handle, (count+1))
         return 1
 
-    def print_article_info(self,title, date, tags_list, author, twitter):
+    def print_article_info(self, title, date, tags_list, author, twitter, count):
         """
         Prints article information according to scraper display preferences
         :param title:
@@ -113,8 +119,8 @@ class Scraper:
         """
         if self.display == "all":
             print("Title:", title, "Date:", date, "Tag_list:", tags_list, "Author Name:", author, "Twitter Handle:",
-              twitter, "\n")
+                  twitter, "\n")
         else:
-            article_info = {"title": title, "date": date, "tags": tags_list, "author": author, "twitter": twitter}
-            print(" ".join(str(choice + ": " + str(article_info[choice])) for choice in self.display if choice in article_info))
-
+            article_info = {"title": title, "date": date, "tags": tags_list, "author": author, "twitter": twitter, "count": count}
+            print(" ".join(
+                str(choice + ": " + str(article_info[choice])) for choice in self.display if choice in article_info))

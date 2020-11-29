@@ -1,3 +1,8 @@
+"""
+File initializes program and CLI
+Authors: Edward Mattout & Daniella Grimberg
+"""
+
 import click
 from selenium.common.exceptions import NoSuchElementException, WebDriverException, NoSuchWindowException
 from config import URL, DISPLAY_OPTIONS
@@ -5,15 +10,22 @@ from Scraper import Scraper
 
 
 def validate_format(ctx, param, value):
+    """
+    Function validates format of user input for CLI parameters
+    :param ctx:
+    :param param: parameter being validated
+    :param value: user inputted value (or default)
+    :return:
+    """
     try:
-        selections = value.lower().split(",") if value != ("all") else value
+        selections = value.lower().split(",") if value != ("all") else value  # make into a list and take lowercase
         if param.name == "authors" and value != ("all"):
-            selections = list(map(lambda n: n.lower().replace("_", " "), selections))
+            selections = list(map(lambda n: n.lower().replace("_", " "), selections))  # reformat author full name
         elif param.name == "months" and value != ("all"):
             for selection in selections:
                 if not selection.isdigit() or int(selection) > 12 or int(selection) < 1: raise ValueError("Month "
-                                                                                                          "selection \""
-                                                                                                          + str(
+                                                                                                          "selection "
+                                                                                                          "" + str(
                     selection) + "\" is not valid. Please choose numbers between 1 and 12")
         elif param.name == "display" and value != ("all"):
             for selection in selections:
@@ -41,19 +53,18 @@ def validate_format(ctx, param, value):
                                              'python3 Scraper.py '
                                              '--today=True \n')
 @click.option('--months', default=("all"), callback=validate_format, help='Option to scrape only articles from '
-                                                                          'specified months(separated by commas, '
-                                                                          'no spaces) Default: all\nExample: python3 '
-                                                                          'Scraper.py --months=1 \n')
+                                                                          'specified months(number indexes separated by'
+                                                                          'commas, no spaces) Default: all\nExample: '
+                                                                          'python3 Scraper.py --months=1,2 \n')
 @click.option('--display', default=("all"), callback=validate_format, help='Option to select information to display '
                                                                            'from '
-                                                                           'tags, title, author, twitter, date ('
+                                                                           'tags, title, author, twitter, date, count ('
                                                                            'separated by commas, no spaces) '
                                                                            'Default: all\n'
                                                                            'Example: python3 Scraper.py '
                                                                            '--display=tags,title \n')
 @click.option('--limit', default=None, type=int, help='Option to limit number of articles. Default: None \nExample: '
                                                       '--limit=250')
-
 def main(tags, authors, months, display, today, limit):
     """
     Main function used to take in user arguments (scraping preferences) and initialize the scraper
@@ -67,8 +78,9 @@ def main(tags, authors, months, display, today, limit):
     """
     print_params = tuple(
         map(lambda p: ', '.join(p) if isinstance(p, tuple) else p, (tags, authors, months, today, display, str(limit))))
-    click.echo(f"Initalizing Techcrunch Webscraper... Currently scraping for: %s tags, %s authors, months number %s . "
-               f"\nScraping only today's articles: %s.\nWill display %s information for articles\nArticle limit: %s" % print_params)
+    click.echo(f"Initializing Techcrunch scraper... Currently scraping for: %s tags, %s authors, months: %s . "
+               f"\nScraping only today's articles: %s.\nWill display %s information for articles\nArticle limit: %s" %
+               print_params)
 
     tc_scraper = Scraper(tags, authors, months, display, today, limit)
 
