@@ -31,9 +31,11 @@ def make_tables():
         cursor.execute("""CREATE TABLE article_to_tags (
                     id INT NOT NULL AUTO_INCREMENT,
                     article_id INT,
-                    tag_id INT,  
-                    FOREIGN KEY (article_id) REFERENCES articles(article_id), 
-                    FOREIGN KEY (tag_id) REFERENCES tags(tag_id),
+                    tag_id INT, 
+                    CONSTRAINT article_id_tag FOREIGN KEY (article_id)
+                    REFERENCES articles(article_id) ON DELETE CASCADE,
+                    CONSTRAINT tag_id_article FOREIGN KEY (tag_id)
+                    REFERENCES tags(tag_id) ON DELETE CASCADE,
                     PRIMARY KEY (id)
                     )""");
         cursor.execute("""CREATE TABLE article_to_authors (
