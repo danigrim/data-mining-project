@@ -7,7 +7,7 @@ import click
 from selenium.common.exceptions import NoSuchElementException, WebDriverException, NoSuchWindowException
 from config import URL, DISPLAY_OPTIONS
 from Scraper import Scraper
-
+from database import make_tables
 
 def validate_format(ctx, param, value):
     """
@@ -35,7 +35,7 @@ def validate_format(ctx, param, value):
                             DISPLAY_OPTIONS))
         return selections
     except ValueError as e:
-        print("Option not properly formatted. Please run python3 Scraper.py --help to check usage")
+        print("Option not properly formatted. Please run python3 main.py --help to check usage")
         raise click.BadParameter(e)
 
 
@@ -43,29 +43,32 @@ def validate_format(ctx, param, value):
 @click.option('--tags', default=("all"), callback=validate_format, help='Option to scrape subset of tags (separated '
                                                                         'by commas, no spaces). Default: all\n '
                                                                         'Example: python3 '
-                                                                        'Scraper.py --tags=gaming,fintech \n')
+                                                                        'main.py --tags=gaming,fintech \n')
 @click.option('--authors', default=("all"), callback=validate_format, help='Option to scrape subset of authors ('
                                                                            'format: name_lastname separated by commas, '
                                                                            'no spaces). Default: all\nExample: python3 '
-                                                                           'Scraper.py '
+                                                                           'main.py '
                                                                            '--authors=Julian_Willson,Martha_Janes\n')
 @click.option('--today', default=False, help='Option to scrape only todays articles. Default:False \n Example: '
-                                             'python3 Scraper.py '
+                                             'python3 main.py '
                                              '--today=True \n')
 @click.option('--months', default=("all"), callback=validate_format, help='Option to scrape only articles from '
                                                                           'specified months(number indexes separated by'
                                                                           'commas, no spaces) Default: all\nExample: '
-                                                                          'python3 Scraper.py --months=1,2 \n')
+                                                                          'python3 main.py --months=1,2 \n')
 @click.option('--display', default=("all"), callback=validate_format, help='Option to select information to display '
                                                                            'from '
                                                                            'tags, title, author, twitter, date, count ('
                                                                            'separated by commas, no spaces) '
                                                                            'Default: all\n'
-                                                                           'Example: python3 Scraper.py '
+                                                                           'Example: python3 main.py '
                                                                            '--display=tags,title \n')
 @click.option('--limit', default=None, type=int, help='Option to limit number of articles. Default: None \nExample: '
                                                       '--limit=250')
-def main(tags, authors, months, display, today, limit):
+@click.option('--make_db', default=False, type=bool, help='Option to initialize database and create necessary tables. '
+                                                         'set to True in first time running scraper. '
+                                                         'Example: python3 main.py --make_db=True ')
+def main(tags, authors, months, display, today, limit, make_db):
     """
     Main function used to take in user arguments (scraping preferences) and initialize the scraper
     :param tags:user list of tags to scrape for
@@ -81,9 +84,9 @@ def main(tags, authors, months, display, today, limit):
     click.echo(f"Initializing Techcrunch scraper... Currently scraping for: %s tags, %s authors, months: %s . "
                f"\nScraping only today's articles: %s.\nWill display %s information for articles\nArticle limit: %s" %
                print_params)
-
+    if make_db:
+        make_tables()
     tc_scraper = Scraper(tags, authors, months, display, today, limit)
-
     try:
         tc_scraper.scrape()
     except NoSuchWindowException as e:
