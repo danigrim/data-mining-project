@@ -50,7 +50,7 @@ def validate_format(ctx, param, value):
                                                                            'no spaces). Default: all\nExample: python3 '
                                                                            'main.py '
                                                                            '--authors=Julian_Willson,Martha_Janes\n')
-@click.option('--today', default=False, help='Option to scrape only todays articles. Default:False \n Example: '
+@click.option('--today', default=False, type=bool, help='Option to scrape only todays articles. Default:False \n Example: '
                                              'python3 main.py '
                                              '--today=True \n')
 @click.option('--months', default=("all"), callback=validate_format, help='Option to scrape only articles from '
