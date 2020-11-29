@@ -29,6 +29,14 @@ def close_database_connection(connection, cursor):
 
 
 def insert_author(connection, cursor, author_name, twitter_handle):
+    """
+
+    :param connection:
+    :param cursor:
+    :param author_name:
+    :param twitter_handle:
+    :return:
+    """
     try:
         cursor.execute("""INSERT IGNORE INTO authors (full_name, twitter_handle)
                         VALUES (%s, %s) """, (author_name, twitter_handle))
@@ -43,6 +51,15 @@ def insert_author(connection, cursor, author_name, twitter_handle):
 
 
 def insert_article(connection, cursor, link, title, date):
+    """
+
+    :param connection:
+    :param cursor:
+    :param link:
+    :param title:
+    :param date:
+    :return:
+    """
     try:
         cursor.execute("""INSERT IGNORE INTO articles (link, title, date) 
                             VALUES (%s, %s, %s)""", (link, title, date))
@@ -57,6 +74,14 @@ def insert_article(connection, cursor, link, title, date):
 
 
 def insert_tag(connection, cursor, tag, article_id):
+    """
+
+    :param connection:
+    :param cursor:
+    :param tag:
+    :param article_id:
+    :return:
+    """
     try:
         cursor.execute("""INSERT IGNORE INTO tags (tag_text) VALUES (%s)""", (tag,))
         connection.commit()
