@@ -75,6 +75,23 @@ def insert_tag(connection, cursor, tag, article_id):
                 print("Failed to insert into table ARTICLE_TO_TAGS {}".format(error))
 
 
+def insert_article_author_relation(connection, cursor, article_id, author_id):
+    """
+    Inserts article author relationship in database
+    :param connection:
+    :param cursor:
+    :param article_id:
+    :param author_id:
+    :return: None
+    """
+    try:
+        cursor.execute("""INSERT IGNORE INTO article_to_authors (article_id, author_id) VALUES (%s, %s)""",
+                       (article_id, author_id))
+        connection.commit()
+    except mysql.connector.Error as error:
+        print("Failed to insert into table ARTICLE_TO_AUTHORS {}".format(error))
+
+
 def insert_article_entry(author_name, twitter_handle, tag_list, title, date ,link):
     """
     Function inserts article information into database
@@ -90,10 +107,6 @@ def insert_article_entry(author_name, twitter_handle, tag_list, title, date ,lin
     article_id = insert_article(connection, cursor, link, title, date)
     for tag in set(tag_list):
         insert_tag(connection, cursor, tag, article_id)
-    # try:
-    #     cursor.execute("""INSERT IGNORE INTO article_to_authors (article_id, author_id) VALUES (?, ?))""", (article_id, author_id))
-    #     connection.commit()
-    # except mysql.connector.Error as error:
-    #     print("Failed to insert into table ARTICLE_TO_AUTHORS {}".format(error))
-   # finally:
+    if article_id and author_id:
+        insert_article_author_relation(connection, cursor, article_id, author_id)
     close_database_connection(connection, cursor)
