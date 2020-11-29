@@ -87,7 +87,7 @@ python3 main.py --display=tags,count,title --limit=10 --months=10,11 --today=Fal
 
 ## Database ERD
 
-<img src="./Techcrunch_Scraper_ERD.pdf">
+<img src="./Techcrunch_Scraper_ERD.pdf" width"300"=>
 
 ### Tables
 
