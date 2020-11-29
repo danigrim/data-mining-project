@@ -1,3 +1,9 @@
+"""
+File for database utilities
+Authors: Edward Mattout & Daniella Grimberg
+"""
+
+
 from config import HOST, DATABASE, USER, PASSWORD
 import mysql.connector
 from mysql.connector import Error
@@ -90,7 +96,7 @@ def insert_tag(connection, cursor, tag, article_id):
     finally:
         cursor.execute("""SELECT tag_id FROM tags WHERE tag_text = (%s)""", (tag,))
         res = cursor.fetchall()
-        tag_id = int(res[0][0]) if res else None
+        tag_id = res[0][0] if res else None
         if tag_id and article_id:
             try:
                 cursor.execute("""INSERT INTO article_to_tags (article_id, tag_id) VALUES (%s, %s)""",

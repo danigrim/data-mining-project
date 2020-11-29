@@ -1,3 +1,9 @@
+"""
+File initializes database tables given configuration parameters
+Authors: Edward Mattout & Daniella Grimberg
+"""
+
+
 import mysql.connector
 from mysql.connector import Error
 from database_utils import connect_to_database, close_database_connection
