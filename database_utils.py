@@ -3,11 +3,27 @@ File for database utilities
 Authors: Edward Mattout & Daniella Grimberg
 """
 
-
-from config import HOST, DATABASE, USER, PASSWORD
+from config import HOST, DATABASE, USER, PASSWORD, LOG_FILE_FORMAT, LOG_FILE_NAME
 import mysql.connector
 from mysql.connector import Error
+import sys
 
+import logging
+
+formatter = logging.Formatter(LOG_FILE_FORMAT)
+
+logger = logging.getLogger('database')
+logger.setLevel(logging.DEBUG)
+
+file_handler = logging.FileHandler(LOG_FILE_NAME)
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(formatter)
+logger.addHandler(file_handler)
+
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setLevel(logging.ERROR)
+stream_handler.setFormatter(formatter)
+logger.addHandler(stream_handler)
 
 def connect_to_database():
     """
@@ -20,7 +36,8 @@ def connect_to_database():
                                          user=USER,
                                          password=PASSWORD)
     except mysql.connector.Error as error:
-        print("Error: Failed to connect to database", error)
+        logger.error("Error: Failed to connect to database", error)
+    logger.info("Succesfully connected to database")
     return connection, connection.cursor()
 
 
@@ -32,6 +49,7 @@ def close_database_connection(connection, cursor):
     if connection.is_connected():
         cursor.close()
         connection.close()
+        logger.info("Successfully closed database connection")
 
 
 def insert_author(connection, cursor, author_name, twitter_handle):
@@ -48,7 +66,7 @@ def insert_author(connection, cursor, author_name, twitter_handle):
                         VALUES (%s, %s) """, (author_name, twitter_handle))
         connection.commit()
     except mysql.connector.Error as error:
-        print("Failed to insert into table AUTHORS {}".format(error))
+        logger.error("Failed to insert into table AUTHORS {}".format(error))
     finally:
         cursor.execute("""SELECT author_id FROM authors WHERE full_name = (%s)""", (author_name,))
         res = cursor.fetchall()
@@ -71,7 +89,7 @@ def insert_article(connection, cursor, link, title, date):
                             VALUES (%s, %s, %s)""", (link, title, date))
         connection.commit()
     except mysql.connector.Error as error:
-        print("Failed to insert into table ARTICLES {}".format(error))
+        logger.error("Failed to insert into table ARTICLES {}".format(error))
     finally:
         cursor.execute("""SELECT article_id FROM articles WHERE title = (%s)""", (title,))
         res = cursor.fetchall()
@@ -92,7 +110,7 @@ def insert_tag(connection, cursor, tag, article_id):
         cursor.execute("""INSERT IGNORE INTO tags (tag_text) VALUES (%s)""", (tag,))
         connection.commit()
     except mysql.connector.Error as error:
-        print("Failed to insert into table TAGS {}".format(error))
+        logger.error("Failed to insert into table TAGS {}".format(error))
     finally:
         cursor.execute("""SELECT tag_id FROM tags WHERE tag_text = (%s)""", (tag,))
         res = cursor.fetchall()
@@ -103,7 +121,7 @@ def insert_tag(connection, cursor, tag, article_id):
                                (article_id, tag_id))
                 connection.commit()
             except mysql.connector.Error as error:
-                print("Failed to insert into table ARTICLE_TO_TAGS {}".format(error))
+                logger.error("Failed to insert into table ARTICLE_TO_TAGS {}".format(error))
 
 
 def insert_article_author_relation(connection, cursor, article_id, author_id):
@@ -120,7 +138,21 @@ def insert_article_author_relation(connection, cursor, article_id, author_id):
                        (article_id, author_id))
         connection.commit()
     except mysql.connector.Error as error:
-        print("Failed to insert into table ARTICLE_TO_AUTHORS {}".format(error))
+        logger.error("Failed to insert into table ARTICLE_TO_AUTHORS {}".format(error))
+
+
+def article_in_database(cursor, title):
+    """
+    Function checks if article already exists in database to avoid need to search
+    :param cursor:
+    :param title:
+    :return:
+    """
+    cursor.execute("""SELECT article_id FROM articles WHERE title = (%s)""", (title,))
+    if cursor.fetchall():
+        logger.info(f"Article with title {title} already in database!")
+        return True
+    return False
 
 
 def insert_article_entry(author_name, twitter_handle, tag_list, title, date, link):
@@ -133,10 +165,13 @@ def insert_article_entry(author_name, twitter_handle, tag_list, title, date, lin
     :return: None
     """
     connection, cursor = connect_to_database()
-    author_id = insert_author(connection, cursor, author_name, twitter_handle)
-    article_id = insert_article(connection, cursor, link, title, date)
-    for tag in set(tag_list):
-        insert_tag(connection, cursor, tag, article_id)
-    if article_id and author_id:
-        insert_article_author_relation(connection, cursor, article_id, author_id)
+    if not article_in_database(cursor, title):
+        author_id = insert_author(connection, cursor, author_name, twitter_handle)
+        article_id = insert_article(connection, cursor, link, title, date)
+        for tag in set(tag_list):
+            insert_tag(connection, cursor, tag, article_id)
+        if article_id and author_id:
+            insert_article_author_relation(connection, cursor, article_id, author_id)
+        else:
+            logger.error(f"Error inserting author article relation for article title {title} and author {author_name}")
     close_database_connection(connection, cursor)

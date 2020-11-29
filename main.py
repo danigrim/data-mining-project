@@ -9,6 +9,7 @@ from config import URL, DISPLAY_OPTIONS
 from Scraper import Scraper
 from database import make_tables
 
+
 def validate_format(ctx, param, value):
     """
     Function validates format of user input for CLI parameters

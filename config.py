@@ -21,3 +21,5 @@ HOST = 'localhost'
 DATABASE = 'techcrunch_cp_2'
 USER = 'root'
 PASSWORD = 'newpass'
+LOG_FILE_FORMAT='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s'
+LOG_FILE_NAME = "tc_db.log"
