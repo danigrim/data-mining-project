@@ -68,7 +68,8 @@ def insert_tag(connection, cursor, tag, article_id):
         tag_id = int(res[0][0]) if res else None
         if tag_id and article_id:
             try:
-                cursor.execute("INSERT INTO article_to_tags (article_id, tag_id) VALUES (5, 1))")
+                cursor.execute("""INSERT INTO article_to_tags (article_id, tag_id) VALUES (%s, %s)""",
+                               (article_id, tag_id))
                 connection.commit()
             except mysql.connector.Error as error:
                 print("Failed to insert into table ARTICLE_TO_TAGS {}".format(error))
@@ -87,7 +88,7 @@ def insert_article_entry(author_name, twitter_handle, tag_list, title, date ,lin
     connection, cursor = connect_to_database()
     author_id = insert_author(connection, cursor, author_name, twitter_handle)
     article_id = insert_article(connection, cursor, link, title, date)
-    for tag in tag_list:
+    for tag in set(tag_list):
         insert_tag(connection, cursor, tag, article_id)
     # try:
     #     cursor.execute("""INSERT IGNORE INTO article_to_authors (article_id, author_id) VALUES (?, ?))""", (article_id, author_id))
