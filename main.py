@@ -1,6 +1,6 @@
 """
 File initializes program and CLI
-Authors: Edward Mattout & Daniella Grimberg
+Authors: Daniella Grimberg & Eddie Mattout
 """
 
 import click
