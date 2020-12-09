@@ -4,11 +4,8 @@ Authors: Daniella Grimberg & Eddie Mattout
 """
 
 import click
-from selenium.common.exceptions import NoSuchElementException, WebDriverException, NoSuchWindowException
 from config import URL, DISPLAY_OPTIONS
-from Scraper import Scraper
-from database import make_tables
-
+from Orchestrator import Orchestrator
 
 def validate_format(ctx, param, value):
     """
@@ -77,6 +74,7 @@ def main(tags, authors, months, display, today, limit, make_db):
     :param months: user list of months by index ex january and february 1,2
     :param display: user list of preferences for what will be displayed
     :param today: Boolean to indicate if to only scrape todays articles
+    :param make_db: True if need to make
     :param limit: (int) limit of iterations
     :return:
     """
@@ -85,14 +83,10 @@ def main(tags, authors, months, display, today, limit, make_db):
     click.echo(f"Initializing Techcrunch scraper... Currently scraping for: %s tags, %s authors, months: %s . "
                f"\nScraping only today's articles: %s.\nWill display %s information for articles\nArticle limit: %s" %
                print_params)
-    if make_db:
-        make_tables()
-    tc_scraper = Scraper(tags, authors, months, display, today, limit)
-    try:
-        tc_scraper.scrape()
-    except NoSuchWindowException as e:
-        print("Error: Window not found. Make sure scraping browser was not closed", e)
+    orchestrator = Orchestrator(tags, authors, months, display, today, limit, make_db)
+    orchestrator.run()
 
 
 if __name__ == '__main__':
     main()
+

@@ -6,13 +6,8 @@ Authors: Edward Mattout & Daniella Grimberg
 from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
-from datetime import datetime
-from utils import get_url
-from database_utils import insert_article_entry
 from selenium.common.exceptions import NoSuchElementException
-import sys
 from selenium.webdriver.common.action_chains import ActionChains
-from Article import Article
 from config import URL, ARTICLE_TAG, LINK_TAG, CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, \
     LOAD_MORE_BUTTON_XPATH, PARSER, LOADING_TIME
 
@@ -41,86 +36,30 @@ class Scraper:
     """
     url = URL
 
-    def __init__(self, tags, authors, months, display, today, limit):
+    def __init__(self):
         """
         Scraper initializer
         """
-        self.tags = tags
-        self.authors = authors
-        self.months = months
-        self.display = display
-        self.today = today
-        self.limit = limit
+        self.can_load_more = True
+        self.articles = set()
+        self.driver = webdriver.Chrome('./chromedriver')
 
-    def scrape(self):
+    def get_new_articles(self):
         """
-        Function uses a selenium chrome driver in order to scrape main page of techcrunch.
-        While there are more articles to load, navigates to each article, scraping  for tags, date, and title
-        Presses load more button
+        Function fetches all new links in the current driver page and returns a set with links
+        :returns: set of new article links
         """
-        driver = webdriver.Chrome('./chromedriver')
-        get_url(self.url, driver)
-        articles = set()
-        load_button = True
-        while load_button:
-            soup = BeautifulSoup(driver.page_source, PARSER)  # re initialize beautiful soup after load more pressed
-            # finds articles in featured category
-            all_articles = [a.findChildren(ARTICLE_TAG)[0] for a in soup.find_all(TAG_FEATURED_ARTICLES,
+        soup = BeautifulSoup(self.driver.page_source, PARSER)  # re initialize beautiful soup after load more pressed
+        # finds articles in featured category
+        all_articles = [a.findChildren(ARTICLE_TAG)[0] for a in soup.find_all(TAG_FEATURED_ARTICLES,
                                                                                   class_=CLASS_FEATURED_ARTICLES)]
-            # finds articles in 'latest' category
-            all_articles.extend(soup.find_all(href=True, class_=CLASS_LATEST_ARTICLES))
-            articles_scraped = 0
-            for a in all_articles:
-                if a[LINK_TAG] not in articles:
-                    articles_scraped += self.get_article_info(a[LINK_TAG], driver, articles_scraped)
-                    if self.limit and articles_scraped >= self.limit:
-                        print("All done... ", self.limit, " articles scraped")
-                        sys.exit(0)
-                    articles.add(a[LINK_TAG])
-            load_button = load_more_posts(driver)
+        # finds articles in 'latest' category
+        all_articles.extend(soup.find_all(href=True, class_=CLASS_LATEST_ARTICLES))
+        new_articles = set()
+        for a in all_articles:
+            if a[LINK_TAG] not in self.articles:
+                new_articles.add(a[LINK_TAG])
+                self.articles.add(a[LINK_TAG])
+        self.can_load_more = load_more_posts(self.driver)
+        return new_articles
 
-    def article_satisfies_options(self, date, author_name, tag_list):
-        if self.authors != "all":
-            if author_name.lower() not in self.authors:
-                return False
-        if self.today:
-            if datetime.today().strftime("%Y/%m/%d") != date:
-                return False
-        if self.months != "all":
-            if date.split("/")[1].strip("0") not in list(map(lambda m: str(m).strip("0"), self.months)):
-                return False
-        if self.tags != "all":
-            if not set(tag_list) & set(self.tags):
-                return False
-        return True
-
-    def get_article_info(self, article, driver, count):
-        """
-        Function prints the relevant info about each article.
-        :param: article : url to relevant article, driver: chrome driver
-        """
-        article_entity = Article(self.url, article)
-        date, title, twitter_handle, author_name, tag_list = article_entity.scrape(driver)
-        if not self.article_satisfies_options(date, author_name, tag_list):
-            return 0
-        insert_article_entry(author_name, twitter_handle, tag_list, title, date, (self.url + article))
-        self.print_article_info(title, date, tag_list, author_name, twitter_handle, (count+1))
-        return 1
-
-    def print_article_info(self, title, date, tags_list, author, twitter, count):
-        """
-        Prints article information according to scraper display preferences
-        :param title:
-        :param date:
-        :param tags_list:
-        :param author:
-        :param twitter:
-        :return:
-        """
-        if self.display == "all":
-            print("Title:", title, "Date:", date, "Tag_list:", tags_list, "Author Name:", author, "Twitter Handle:",
-                  twitter, "\n")
-        else:
-            article_info = {"title": title, "date": date, "tags": tags_list, "author": author, "twitter": twitter, "count": count}
-            print(" ".join(
-                str(choice + ": " + str(article_info[choice])) for choice in self.display if choice in article_info))

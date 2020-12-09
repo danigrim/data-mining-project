@@ -23,3 +23,12 @@ USER = 'root'
 PASSWORD = 'newpass'
 LOG_FILE_FORMAT='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s'
 LOG_FILE_NAME = "tc_db.log"
+
+#NewsApi configuration
+API_KEY='728ed57ac55b4d0ab800e16830bd6055'
+API_BASE_URL=f'https://newsapi.org/v2/everything?excludeDomains=techcrunch.com'
+STATUS_OK = 'ok'
+ARTICLE_PARAM = 'articles'
+AUTHOR_PARAM = 'author'
+TITLE_PARAM = 'title'
+DATE_PARAM = 'publishedAt'

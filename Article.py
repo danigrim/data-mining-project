@@ -63,12 +63,12 @@ class Article:
     def scrape(self, driver):
         get_url(self.url, driver)
         soup = BeautifulSoup(driver.page_source, PARSER)
-        date, title = self.get_date_title()
+        date, month, title = self.get_date_title()
         twitter_handle = get_twitter_handle(soup)
         author_name = get_author_name(soup)
         tag_list = get_tag_list(soup)
         driver.back()  # Move back to main page
-        return date, title, twitter_handle, author_name, tag_list
+        return date, title, twitter_handle, author_name, tag_list, month
 
     def get_date_title(self):
         """
@@ -79,7 +79,8 @@ class Article:
         date, title = "", ""
         try:
             date, title = self.title.rsplit('/', 2)[0][1:], self.title.rsplit('/', 2)[1]
+            month = date.split("/")[1].strip("0")
         except IndexError as e:
             print("Error: Unrecognized format for article date and title", e)
         finally:
-            return date, title
+            return date, month, title

@@ -6,6 +6,7 @@ Authors: Edward Mattout & Daniella Grimberg
 from selenium.common.exceptions import WebDriverException
 import sys
 
+
 def get_url(url, driver):
     """
     Function uses driver to retrieve URL . Exits with 1 if driver not reachable
