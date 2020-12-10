@@ -3,7 +3,7 @@ File for News Api class, makes get requests to NewsApi to get articles
 Authors: Daniella Grimberg & Edward Mattout
 """
 
-from config import API_KEY, API_BASE_URL, LOG_FILE_FORMAT,LOG_FILE_NAME, STATUS_OK, \
+from config import API_KEY, API_BASE_URL, LOG_FILE_FORMAT,LOG_FILE_NAME_API, STATUS_OK, \
     ARTICLE_PARAM, AUTHOR_PARAM, TITLE_PARAM, DATE_PARAM
 import sys
 import requests
@@ -12,10 +12,10 @@ import logging
 
 formatter = logging.Formatter(LOG_FILE_FORMAT)
 
-logger = logging.getLogger('database')
+logger = logging.getLogger('newsapi')
 logger.setLevel(logging.DEBUG)
 
-file_handler = logging.FileHandler(LOG_FILE_NAME)
+file_handler = logging.FileHandler(LOG_FILE_NAME_API)
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -50,12 +50,12 @@ class NewsApi:
         for tag in self.tags:
             url = self.base_url + f"&q={tag}" + f"&apikey={API_KEY}"
             resp = json.loads(requests.get(url).content)
-            print(resp)
             if resp['status'] != STATUS_OK:
                 r_s = resp['status']
-                logging.error(f'Unable to make get request to NewsAPI status code: {r_s}, url attempted: {self.url}')
+                logger.info(f'Unable to make get request to NewsAPI status code: {r_s}, url attempted: {url}')
+                return []
             article_list.append(resp[ARTICLE_PARAM])
-        return article_list[0]
+        return article_list[0] if article_list else []
 
 
     def get_article_info(self, article):
@@ -74,7 +74,3 @@ class NewsApi:
         :return:
         """
         return article[TITLE_PARAM] not in self.articles
-
-
-na = NewsApi(['daniela'])
-print(na.get_article_list())

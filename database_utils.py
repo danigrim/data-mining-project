@@ -8,6 +8,7 @@ import mysql.connector
 import sys
 import logging
 
+
 formatter = logging.Formatter(LOG_FILE_FORMAT)
 
 logger = logging.getLogger('database')

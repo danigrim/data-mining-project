@@ -29,6 +29,10 @@ class Orchestrator:
             make_tables()
 
     def run(self):
+        """
+        Runs main program flow
+        :return:
+        """
         while self.tc_scraper.can_load_more:
             accumulated_tags = set()
             try:
