@@ -53,8 +53,8 @@ class NewsApi:
             if resp['status'] != STATUS_OK:
                 r_s = resp['status']
                 logger.info(f'Unable to make get request to NewsAPI status code: {r_s}, url attempted: {url}')
-                return []
-            article_list.append(resp[ARTICLE_PARAM])
+            else:
+                article_list.append(resp[ARTICLE_PARAM])
         return article_list[0] if article_list else []
 
 
