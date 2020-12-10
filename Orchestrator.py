@@ -1,6 +1,6 @@
 from Scraper import Scraper
 from database import make_tables
-from selenium.common.exceptions import NoSuchElementException, WebDriverException, NoSuchWindowException
+from selenium.common.exceptions import NoSuchWindowException
 from utils import get_url
 from Article import Article
 from database_utils import insert_article_entry
@@ -41,7 +41,8 @@ class Orchestrator:
                     date, title, twitter_handle, author_name, tag_list, month = self.init_article(article)
                     satisfies_reqs = self.article_satisfies_options(date, month, author_name, tag_list)
                     if satisfies_reqs:
-                        self.handle_article(author_name, twitter_handle, tag_list, title, date, (self.tc_scraper.url + article))
+                        self.handle_article(author_name, twitter_handle, tag_list, title, date,
+                                            (self.tc_scraper.url + article))
                         accumulated_tags.update(tag_list)
             except NoSuchWindowException as e:
                 print("Error: Window not found. Make sure scraping browser was not closed", e)
@@ -110,6 +111,7 @@ class Orchestrator:
         :param date: article date
         :param author_name: article author
         :param tag_list: article tag list
+        :param month: article month
         :return:
         """
         if self.authors != "all":
@@ -151,4 +153,3 @@ def initialize_scraper():
     tc_scraper = Scraper()
     get_url(tc_scraper.url, tc_scraper.driver)
     return tc_scraper
-

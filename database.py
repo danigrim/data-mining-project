@@ -23,31 +23,33 @@ stream_handler.setLevel(logging.ERROR)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
+
 def make_tables():
     """
     Function creates database tables
     :return:
     """
+    connection, cursor = None, None
     try:
         connection, cursor = connect_to_database()
         if not connection and cursor:
             raise mysql.connector.Error("No connection")
-        cursor.execute( """CREATE TABLE authors (
+        cursor.execute("""CREATE TABLE authors (
                 author_id INT NOT NULL AUTO_INCREMENT,
                 full_name VARCHAR(45) UNIQUE,
                 twitter_handle VARCHAR(45),
-                PRIMARY KEY (author_id))""");
-        cursor.execute( """CREATE TABLE articles (
+                PRIMARY KEY (author_id))""")
+        cursor.execute("""CREATE TABLE articles (
                 article_id INT NOT NULL AUTO_INCREMENT,
                 link VARCHAR(250) UNIQUE,
                 title VARCHAR(250) UNIQUE,
                 date DATETIME,
-                PRIMARY KEY (article_id))""");
+                PRIMARY KEY (article_id))""")
         cursor.execute("""CREATE TABLE tags (
                     tag_id INT NOT NULL AUTO_INCREMENT,
                     tag_text VARCHAR(45) UNIQUE,
                     PRIMARY KEY (tag_id))
-                    """);
+                    """)
         cursor.execute("""CREATE TABLE article_to_tags (
                     id INT NOT NULL AUTO_INCREMENT,
                     article_id INT,
@@ -57,7 +59,7 @@ def make_tables():
                     CONSTRAINT tag_id_article FOREIGN KEY (tag_id)
                     REFERENCES tags(tag_id) ON DELETE CASCADE,
                     PRIMARY KEY (id)
-                    )""");
+                    )""")
         cursor.execute("""CREATE TABLE article_to_authors (
                     id INT NOT NULL AUTO_INCREMENT,
                     article_id INT,
@@ -65,15 +67,14 @@ def make_tables():
                     FOREIGN KEY (article_id) REFERENCES articles(article_id),
                     FOREIGN KEY (author_id) REFERENCES authors(author_id),
                     PRIMARY KEY (id)
-                    )""");
-        logger.info("Succesfully created tables in database")
+                    )""")
+        logger.info("Successfully created tables in database")
     except mysql.connector.Error as error:
         logger.error("Failed to create table in MySQL: {}".format(error))
     finally:
-        close_database_connection(connection, cursor)
+        if connection and cursor:
+            close_database_connection(connection, cursor)
 
 
 if __name__ == '__main__':
     make_tables()
-
-

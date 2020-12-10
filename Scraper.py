@@ -52,7 +52,7 @@ class Scraper:
         soup = BeautifulSoup(self.driver.page_source, PARSER)  # re initialize beautiful soup after load more pressed
         # finds articles in featured category
         all_articles = [a.findChildren(ARTICLE_TAG)[0] for a in soup.find_all(TAG_FEATURED_ARTICLES,
-                                                                                  class_=CLASS_FEATURED_ARTICLES)]
+                                                                              class_=CLASS_FEATURED_ARTICLES)]
         # finds articles in 'latest' category
         all_articles.extend(soup.find_all(href=True, class_=CLASS_LATEST_ARTICLES))
         new_articles = set()
@@ -62,4 +62,3 @@ class Scraper:
                 self.articles.add(a[LINK_TAG])
         self.can_load_more = load_more_posts(self.driver)
         return new_articles
-

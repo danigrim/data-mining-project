@@ -7,6 +7,7 @@ import click
 from config import URL, DISPLAY_OPTIONS
 from Orchestrator import Orchestrator
 
+
 def validate_format(ctx, param, value):
     """
     Function validates format of user input for CLI parameters
@@ -16,16 +17,16 @@ def validate_format(ctx, param, value):
     :return:
     """
     try:
-        selections = value.lower().split(",") if value != ("all") else value  # make into a list and take lowercase
-        if param.name == "authors" and value != ("all"):
+        selections = value.lower().split(",") if value != "all" else value  # make into a list and take lowercase
+        if param.name == "authors" and value != "all":
             selections = list(map(lambda n: n.lower().replace("_", " "), selections))  # reformat author full name
-        elif param.name == "months" and value != ("all"):
+        elif param.name == "months" and value != "all":
             for selection in selections:
                 if not selection.isdigit() or int(selection) > 12 or int(selection) < 1: raise ValueError("Month "
                                                                                                           "selection "
                                                                                                           "" + str(
                     selection) + "\" is not valid. Please choose numbers between 1 and 12")
-        elif param.name == "display" and value != ("all"):
+        elif param.name == "display" and value != "all":
             for selection in selections:
                 if selection not in DISPLAY_OPTIONS:
                     raise ValueError(
@@ -38,34 +39,35 @@ def validate_format(ctx, param, value):
 
 
 @click.command()
-@click.option('--tags', default=("all"), callback=validate_format, help='Option to scrape subset of tags (separated '
-                                                                        'by commas, no spaces). Default: all\n '
-                                                                        'Example: python3 '
-                                                                        'main.py --tags=gaming,fintech \n')
-@click.option('--authors', default=("all"), callback=validate_format, help='Option to scrape subset of authors ('
-                                                                           'format: name_lastname separated by commas, '
-                                                                           'no spaces). Default: all\nExample: python3 '
-                                                                           'main.py '
-                                                                           '--authors=Julian_Willson,Martha_Janes\n')
-@click.option('--today', default=False, type=bool, help='Option to scrape only todays articles. Default:False \n Example: '
-                                             'python3 main.py '
-                                             '--today=True \n')
-@click.option('--months', default=("all"), callback=validate_format, help='Option to scrape only articles from '
-                                                                          'specified months(number indexes separated by'
-                                                                          'commas, no spaces) Default: all\nExample: '
-                                                                          'python3 main.py --months=1,2 \n')
-@click.option('--display', default=("all"), callback=validate_format, help='Option to select information to display '
-                                                                           'from '
-                                                                           'tags, title, author, twitter, date, count ('
-                                                                           'separated by commas, no spaces) '
-                                                                           'Default: all\n'
-                                                                           'Example: python3 main.py '
-                                                                           '--display=tags,title \n')
+@click.option('--tags', default="all", callback=validate_format, help='Option to scrape subset of tags (separated '
+                                                                      'by commas, no spaces). Default: all\n '
+                                                                      'Example: python3 '
+                                                                      'main.py --tags=gaming,fintech \n')
+@click.option('--authors', default="all", callback=validate_format, help='Option to scrape subset of authors ('
+                                                                         'format: name_lastname separated by commas, '
+                                                                         'no spaces). Default: all\nExample: python3 '
+                                                                         'main.py '
+                                                                         '--authors=Julian_Willson,Martha_Janes\n')
+@click.option('--today', default=False, type=bool,
+              help='Option to scrape only todays articles. Default:False \n Example: '
+                   'python3 main.py '
+                   '--today=True \n')
+@click.option('--months', default="all", callback=validate_format, help='Option to scrape only articles from '
+                                                                        'specified months(number indexes separated by'
+                                                                        'commas, no spaces) Default: all\nExample: '
+                                                                        'python3 main.py --months=1,2 \n')
+@click.option('--display', default="all", callback=validate_format, help='Option to select information to display '
+                                                                         'from '
+                                                                         'tags, title, author, twitter, date, count ('
+                                                                         'separated by commas, no spaces) '
+                                                                         'Default: all\n'
+                                                                         'Example: python3 main.py '
+                                                                         '--display=tags,title \n')
 @click.option('--limit', default=None, type=int, help='Option to limit number of articles. Default: None \nExample: '
                                                       '--limit=250')
 @click.option('--make_db', default=False, type=bool, help='Option to initialize database and create necessary tables. '
-                                                         'set to True in first time running scraper. '
-                                                         'Example: python3 main.py --make_db=True ')
+                                                          'set to True in first time running scraper. '
+                                                          'Example: python3 main.py --make_db=True ')
 def main(tags, authors, months, display, today, limit, make_db):
     """
     Main function used to take in user arguments (scraping preferences) and initialize the scraper
@@ -89,4 +91,3 @@ def main(tags, authors, months, display, today, limit, make_db):
 
 if __name__ == '__main__':
     main()
-

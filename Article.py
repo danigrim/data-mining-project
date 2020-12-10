@@ -16,8 +16,8 @@ def get_twitter_handle(soup):
     :return:
     """
     twitter = soup.find(class_=TWITTER_HANDLE_CLASS)
-    twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter and twitter.findChildren \
-        (ARTICLE_TAG) else "No Twitter account"
+    twitter_handle = twitter.findChildren(ARTICLE_TAG)[0][LINK_TAG] if twitter and twitter.findChildren(ARTICLE_TAG) \
+        else "No Twitter account"
     return twitter_handle
 
 
@@ -76,7 +76,7 @@ class Article:
         :param self:
         :return: date, title or empty strings if none found
         """
-        date, title = "", ""
+        date, title, month = "", "", ""
         try:
             date, title = self.title.rsplit('/', 2)[0][1:], self.title.rsplit('/', 2)[1]
             month = date.split("/")[1].strip("0")

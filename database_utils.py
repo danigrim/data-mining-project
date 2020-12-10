@@ -8,7 +8,6 @@ import mysql.connector
 import sys
 import logging
 
-
 formatter = logging.Formatter(LOG_FILE_FORMAT)
 
 logger = logging.getLogger('database')
@@ -24,6 +23,7 @@ stream_handler.setLevel(logging.ERROR)
 stream_handler.setFormatter(formatter)
 logger.addHandler(stream_handler)
 
+
 def connect_to_database():
     """
     Function creates connection to database
@@ -31,12 +31,13 @@ def connect_to_database():
     """
     try:
         connection = mysql.connector.connect(host=HOST,
-                                         database=DATABASE,
-                                         user=USER,
-                                         password=PASSWORD)
+                                             database=DATABASE,
+                                             user=USER,
+                                             password=PASSWORD)
     except mysql.connector.Error as error:
-        logger.error("Error: Failed to connect to database", error)
-    logger.info("Succesfully connected to database")
+        logger.error("Error: Failed to connect to database. Exiting Program", error)
+        sys.exit(1)
+    logger.info("Successfully connected to database")
     return connection, connection.cursor()
 
 
@@ -158,6 +159,8 @@ def insert_article_entry(author_name, twitter_handle, tag_list, title, date, lin
     """
     Function inserts article information into database
     :param author_name: name of author
+    :param date: article date
+    :param link article link
     :param twitter_handle: authors' twitter handle
     :param tag_list: list of tags associated to article
     :param title: title of article
