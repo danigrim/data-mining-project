@@ -55,7 +55,7 @@ class NewsApi:
                 logger.info(f'Unable to make get request to NewsAPI status code: {r_s}, url attempted: {url}')
             else:
                 article_list.extend(resp[ARTICLE_PARAM])
-        return article_list[0] if article_list else []
+        return article_list if article_list else []
 
 
     def get_article_info(self, article):
@@ -74,10 +74,3 @@ class NewsApi:
         :return:
         """
         return article[TITLE_PARAM] not in self.articles
-
-
-na = NewsApi(['israel'])
-al = na.get_article_list()
-for a in al:
-    print(a)
-    print(na.get_article_info(a))

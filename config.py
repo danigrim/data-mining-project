@@ -25,7 +25,7 @@ LOG_FILE_FORMAT='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-L
 LOG_FILE_NAME = "tc_db.log"
 
 #NewsApi configuration
-API_KEY='282e0e7c66004708984d2f911c206c9c'
+API_KEY='59ca459c96224bbca78001b6b67c28c5'
 API_BASE_URL=f'https://newsapi.org/v2/everything?excludeDomains=techcrunch.com'
 STATUS_OK = 'ok'
 ARTICLE_PARAM = 'articles'
