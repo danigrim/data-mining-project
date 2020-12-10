@@ -4,7 +4,7 @@ Authors: Daniella Grimberg & Edward Mattout
 """
 
 from config import API_KEY, API_BASE_URL, LOG_FILE_FORMAT,LOG_FILE_NAME_API, STATUS_OK, \
-    ARTICLE_PARAM, AUTHOR_PARAM, TITLE_PARAM, DATE_PARAM
+    ARTICLE_PARAM, AUTHOR_PARAM, TITLE_PARAM, DATE_PARAM, URL_PARAM
 import sys
 import requests
 import json
@@ -54,19 +54,19 @@ class NewsApi:
                 r_s = resp['status']
                 logger.info(f'Unable to make get request to NewsAPI status code: {r_s}, url attempted: {url}')
             else:
-                article_list.append(resp[ARTICLE_PARAM])
+                article_list.extend(resp[ARTICLE_PARAM])
         return article_list[0] if article_list else []
 
 
     def get_article_info(self, article):
         title = article[TITLE_PARAM]
-        source = article['source']['name']
+        url = article[URL_PARAM]
         author = article[AUTHOR_PARAM]
         tags_list = self.tags
         date = article[DATE_PARAM]
         month = date.split("-")[1]
         self.articles.add(title)
-        return date, month, title, author, tags_list, source
+        return date, month, title, author, tags_list, url
 
     def article_unseen(self, article):
         """
@@ -74,3 +74,10 @@ class NewsApi:
         :return:
         """
         return article[TITLE_PARAM] not in self.articles
+
+
+na = NewsApi(['israel'])
+al = na.get_article_list()
+for a in al:
+    print(a)
+    print(na.get_article_info(a))
