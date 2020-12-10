@@ -4,7 +4,7 @@
 
 ## **Description**
 
-Web scraper for TechCrunch. Scrapes main page and accesses all articles, printing out their title, date published and the tags associated with the article. Loads more pages of articles until user quits program or no more articles available.
+Web scraper for TechCrunch and related articles. Scrapes main page and accesses all articles, printing out their title, date published and the tags associated with the article. Loads more pages of articles until user quits program or no more articles available. Also uses GNews API to get related articles and scrapes them. 
 
 ## **Requirements & Installations**
 
