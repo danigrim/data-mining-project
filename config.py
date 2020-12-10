@@ -24,13 +24,15 @@ PASSWORD = 'newpass'
 LOG_FILE_FORMAT='%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s'
 LOG_FILE_NAME = "tc_db.log"
 
-#NewsApi configuration
-API_KEY='59ca459c96224bbca78001b6b67c28c5'
-API_BASE_URL=f'https://newsapi.org/v2/everything?excludeDomains=techcrunch.com'
+#Gnews configuration
+API_KEY='77dac3ede38db75a8712d54760dd2b42'
+API_BASE_URL='https://gnews.io/api/v4/search?'
 STATUS_OK = 'ok'
 ARTICLE_PARAM = 'articles'
+NUM_ARTICLES_PARAM= 'totalArticles'
 AUTHOR_PARAM = 'author'
 TITLE_PARAM = 'title'
 DATE_PARAM = 'publishedAt'
-LOG_FILE_NAME_API='newsapi.log'
+LOG_FILE_NAME_API='gnews.log'
 URL_PARAM = 'url'
+API_ERROR_TAG = 'errors'

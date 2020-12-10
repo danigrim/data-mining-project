@@ -1,10 +1,10 @@
 """
-File for News Api class, makes get requests to NewsApi to get articles
+File for News Api class, makes get requests to GNewsApi to get articles
 Authors: Daniella Grimberg & Edward Mattout
 """
 
 from config import API_KEY, API_BASE_URL, LOG_FILE_FORMAT,LOG_FILE_NAME_API, STATUS_OK, \
-    ARTICLE_PARAM, AUTHOR_PARAM, TITLE_PARAM, DATE_PARAM, URL_PARAM
+    ARTICLE_PARAM, AUTHOR_PARAM, TITLE_PARAM, DATE_PARAM, URL_PARAM, NUM_ARTICLES_PARAM, API_ERROR_TAG
 import sys
 import requests
 import json
@@ -27,42 +27,49 @@ logger.addHandler(stream_handler)
 
 
 class NewsApi:
-
     """
-    Class used to make get requests to NewsApi
+    Class used to make get requests to GNewsAPi
     """
     base_url = API_BASE_URL
 
     def __init__(self, tags=[]):
         """
         Api Interaction initialzier
+        :params: tags list to search for
         """
         self.tags = list(tags)
         self.articles = set()
 
-
     def get_article_list(self):
         """
         Make get request to api fetch list of articles
-        :return:
+        :return: list with article entry information
         """
         article_list = []
         for tag in self.tags:
-            url = self.base_url + f"&q={tag}" + f"&apikey={API_KEY}"
-            resp = json.loads(requests.get(url).content)
-            if resp['status'] != STATUS_OK:
-                r_s = resp['status']
-                logger.info(f'Unable to make get request to NewsAPI status code: {r_s}, url attempted: {url}')
-            else:
-                article_list.extend(resp[ARTICLE_PARAM])
+            if len(tag) > 4 and not tag.count(" "):
+                url = self.base_url + f"q=\"{tag}\"" + f"&token={API_KEY}"
+                resp = json.loads(requests.get(url).content)
+                if API_ERROR_TAG in resp:
+                    error = resp[API_ERROR_TAG]
+                    logger.info(f'Unable to make get request to Gnews, response: {error}')
+                elif resp[NUM_ARTICLES_PARAM] > 0:
+                    articles = resp[ARTICLE_PARAM]
+                    for item in articles:
+                        item.update({"tag": tag})
+                    article_list.extend(articles)
         return article_list if article_list else []
 
-
     def get_article_info(self, article):
+        """
+        Function gets information of article entry
+        :param article: dictionary of article
+        :return: date, month, title, author, tags_list, url
+        """
         title = article[TITLE_PARAM]
         url = article[URL_PARAM]
-        author = article[AUTHOR_PARAM]
-        tags_list = self.tags
+        author = article['source']['name']
+        tags_list = article['tag']
         date = article[DATE_PARAM]
         month = date.split("-")[1]
         self.articles.add(title)
@@ -70,6 +77,7 @@ class NewsApi:
 
     def article_unseen(self, article):
         """
+        Function checks if article has been printed and added yet
         :param article:
         :return:
         """

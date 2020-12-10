@@ -41,7 +41,7 @@ class Orchestrator:
                     date, title, twitter_handle, author_name, tag_list, month = self.init_article(article)
                     satisfies_reqs = self.article_satisfies_options(date, month, author_name, tag_list)
                     if satisfies_reqs:
-                        self.handle_article(author_name, twitter_handle, tag_list, title, date, article)
+                        self.handle_article(author_name, twitter_handle, tag_list, title, date, (self.tc_scraper.url + article))
                         accumulated_tags.update(tag_list)
             except NoSuchWindowException as e:
                 print("Error: Window not found. Make sure scraping browser was not closed", e)
@@ -49,11 +49,28 @@ class Orchestrator:
                 self.get_news_api_articles(accumulated_tags)
 
     def init_article(self, article):
+        """
+        Function to initialize an article entry and get information
+        :param article: article to initialize
+        :return: date, title, twitter_handle, author_name, tag_list, month scrapped from article
+        """
         article_entity = Article(self.tc_scraper.url, article)
         return article_entity.scrape(self.tc_scraper.driver)
 
     def handle_article(self, author_name, twitter_handle, tag_list, title, date, article):
-        insert_article_entry(author_name, twitter_handle, tag_list, title, date, (self.tc_scraper.url + article))
+        """
+        Function orchestrates actions related to article - calls function to insert article into database
+        Print the relevant information. Updates the number of articles scrapped and checks if exceeded limit
+        of scraper (if a limit existed)
+        :param author_name: name of author for techcrunch website or source domain for newsApi entries
+        :param twitter_handle: Twitter handle or "No Twitter Account" if none exist
+        :param tag_list: tag list of article
+        :param title: title of article
+        :param date: date of article
+        :param article: url of article
+        :return:
+        """
+        insert_article_entry(author_name, twitter_handle, tag_list, title, date, article)
         self.print_article_info(title, date, tag_list, author_name, twitter_handle)
         self.articles_scraped += 1
         self.check_exceeded_limit()
@@ -61,11 +78,11 @@ class Orchestrator:
     def print_article_info(self, title, date, tags_list, author, twitter):
         """
         Prints article information according to display preferences
-        :param title:
-        :param date:
-        :param tags_list:
-        :param author:
-        :param twitter:
+        :param author: name of author for techcrunch website or source domain for newsApi entries
+        :param twitter: Twitter handle or "No Twitter Account" if none exist
+        :param tags_list: tag list of article
+        :param title: title of article
+        :param date: date of article
         :return:
         """
         if self.display == "all":
@@ -81,6 +98,7 @@ class Orchestrator:
         """
         Function checks if article limit has exceeded based on setting
         :return: True if limited exceeded, False otherwise
+        :exits with code 0 if passed limits
         """
         if self.limit and self.articles_scraped >= self.limit:
             print("All done... ", self.tc_scraper.limit, " articles scraped")
@@ -109,17 +127,27 @@ class Orchestrator:
         return True
 
     def get_news_api_articles(self, accumulated_tags):
+        """
+        Function orchestrates integration with NewsApi initializes instance of class,
+        gets list of articles, check if they satisfy requirements and call handler function
+        :param accumulated_tags: tags to search for
+        :return:
+        """
         n_api = NewsApi([tag for tag in accumulated_tags])
         api_article_list = n_api.get_article_list()
         for a in api_article_list:
             if n_api.article_unseen(a):
-                date, month, title, author_name, tag_list, source = n_api.get_article_info(api_article_list)
+                date, month, title, author_name, tag_list, source = n_api.get_article_info(a)
                 satisfies_reqs = self.article_satisfies_options(date, month, author_name, tag_list)
                 if satisfies_reqs:
                     self.handle_article(author_name, "No Twitter Account", tag_list, title, date, source)
 
 
 def initialize_scraper():
+    """
+    Initialize Scraper and call function to make get request
+    :return:
+    """
     tc_scraper = Scraper()
     get_url(tc_scraper.url, tc_scraper.driver)
     return tc_scraper
