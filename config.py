@@ -20,7 +20,7 @@ URL = 'https://techcrunch.com/'
 HOST = '127.0.0.1'
 DATABASE = 'techcrunch_cp_2'
 USER = 'root'
-PASSWORD = 'newpass'
+PASSWORD = 'BeautifulCat2345!'
 LOG_FILE_FORMAT = '%(asctime)s-%(levelname)s-FILE:%(filename)s-FUNC:%(funcName)s-LINE:%(lineno)d-%(message)s'
 LOG_FILE_NAME = "tc_db.log"
 
