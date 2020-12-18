@@ -3,10 +3,11 @@ File initializes database tables given configuration parameters
 Authors: Edward Mattout & Daniella Grimberg
 """
 
+import logging
+import sys
+
 import mysql.connector
 from database_utils import connect_to_database, close_database_connection, LOG_FILE_FORMAT, LOG_FILE_NAME
-import sys
-import logging
 
 formatter = logging.Formatter(LOG_FILE_FORMAT)
 

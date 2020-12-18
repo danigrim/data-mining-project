@@ -3,8 +3,9 @@ File for utility functions
 Authors: Edward Mattout & Daniella Grimberg
 """
 
-from selenium.common.exceptions import WebDriverException
 import sys
+
+from selenium.common.exceptions import WebDriverException
 
 
 def get_url(url, driver):

@@ -4,8 +4,8 @@ Authors: Daniella Grimberg & Eddie Mattout
 """
 
 import click
-from config import URL, DISPLAY_OPTIONS
 from Orchestrator import Orchestrator
+from config import DISPLAY_OPTIONS
 
 
 def validate_format(ctx, param, value):

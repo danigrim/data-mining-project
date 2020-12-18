@@ -3,12 +3,13 @@ File for News Api class, makes get requests to GNewsApi to get articles
 Authors: Daniella Grimberg & Edward Mattout
 """
 
-from config import API_KEY, API_BASE_URL, LOG_FILE_FORMAT, LOG_FILE_NAME_API, STATUS_OK, \
-    ARTICLE_PARAM, AUTHOR_PARAM, TITLE_PARAM, DATE_PARAM, URL_PARAM, NUM_ARTICLES_PARAM, API_ERROR_TAG
-import sys
-import requests
 import json
 import logging
+import sys
+
+import requests
+from config import API_KEY, API_BASE_URL, LOG_FILE_FORMAT, LOG_FILE_NAME_API, ARTICLE_PARAM, TITLE_PARAM, DATE_PARAM, \
+    URL_PARAM, NUM_ARTICLES_PARAM, API_ERROR_TAG
 
 formatter = logging.Formatter(LOG_FILE_FORMAT)
 

@@ -1,12 +1,13 @@
+import sys
+from datetime import datetime
+
+from Article import Article
+from NewsApi import NewsApi
 from Scraper import Scraper
 from database import make_tables
+from database_utils import insert_article_entry
 from selenium.common.exceptions import NoSuchWindowException
 from utils import get_url
-from Article import Article
-from database_utils import insert_article_entry
-import sys
-from NewsApi import NewsApi
-from datetime import datetime
 
 
 class Orchestrator:

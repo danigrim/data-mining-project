@@ -3,13 +3,14 @@ File for Scraper class and its functions
 Authors: Edward Mattout & Daniella Grimberg
 """
 
-from bs4 import BeautifulSoup
-from selenium import webdriver
 import time
-from selenium.common.exceptions import NoSuchElementException
-from selenium.webdriver.common.action_chains import ActionChains
+
+from bs4 import BeautifulSoup
 from config import URL, ARTICLE_TAG, LINK_TAG, CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, \
     LOAD_MORE_BUTTON_XPATH, PARSER, LOADING_TIME
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.action_chains import ActionChains
 
 
 def load_more_posts(driver):

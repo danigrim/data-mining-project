@@ -5,8 +5,8 @@ Authors: Edward Mattout & Daniella Grimberg
 
 
 from bs4 import BeautifulSoup
-from utils import get_url
 from config import TAGS_CLASS, ARTICLE_TAG, PARSER, LINK_TAG, LIST_ITEM, TWITTER_HANDLE_CLASS, AUTHOR_TAG
+from utils import get_url
 
 
 def get_twitter_handle(soup):
