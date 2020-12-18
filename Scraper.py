@@ -47,7 +47,7 @@ class Scraper:
         """
         self.can_load_more = True
         self.articles = set()
-        self.driver = webdriver.Chrome('./chromedriver')
+        self.driver = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
 
     def get_new_articles(self):
         """
