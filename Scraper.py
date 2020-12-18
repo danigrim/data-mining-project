@@ -9,10 +9,13 @@ from bs4 import BeautifulSoup
 from config import URL, ARTICLE_TAG, LINK_TAG, CLASS_FEATURED_ARTICLES, TAG_FEATURED_ARTICLES, CLASS_LATEST_ARTICLES, \
     LOAD_MORE_BUTTON_XPATH, PARSER, LOADING_TIME
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
-options = webdriver.ChromeOptions()
-options.headless = True
+chrome_options = Options()
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
 
 def load_more_posts(driver):
     """
