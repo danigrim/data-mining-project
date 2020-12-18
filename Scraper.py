@@ -12,6 +12,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
+from webdriver_manager.chrome import ChromeDriverManager
+
 chrome_options = Options()
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--no-sandbox')
@@ -47,7 +49,7 @@ class Scraper:
         """
         self.can_load_more = True
         self.articles = set()
-        self.driver = webdriver.Chrome('./chromedriver', chrome_options=chrome_options)
+        self.driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
 
     def get_new_articles(self):
         """
