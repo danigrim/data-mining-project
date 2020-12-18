@@ -17,7 +17,7 @@ LOADING_TIME = 5
 URL = 'https://techcrunch.com/'
 
 # Database configurations
-HOST = 'ec2-54-151-117-177.us-west-1.compute.amazonaws.com localhost'
+HOST = 'http://10.0.2.2/'
 DATABASE = 'techcrunch_cp_2'
 USER = 'root'
 PASSWORD = 'newpass'
