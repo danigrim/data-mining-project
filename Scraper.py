@@ -11,7 +11,8 @@ from config import URL, ARTICLE_TAG, LINK_TAG, CLASS_FEATURED_ARTICLES, TAG_FEAT
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.action_chains import ActionChains
-
+options = webdriver.ChromeOptions()
+options.headless = True
 
 def load_more_posts(driver):
     """
