@@ -49,7 +49,7 @@ class NewsApi:
         article_list = []
         for tag in self.tags:
             if len(tag) > 4 and not tag.count(" "):
-                url = self.base_url + f"q=\"{tag}\"" + f"&token={API_KEY}"
+                url = self.base_url + f"q=\"{tag}\"" + f"&lang=eng" + f"&token={API_KEY}"
                 resp = json.loads(requests.get(url).content)
                 if API_ERROR_TAG in resp:
                     error = resp[API_ERROR_TAG]
