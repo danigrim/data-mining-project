@@ -17,7 +17,7 @@ LOADING_TIME = 5
 URL = 'https://techcrunch.com/'
 
 # Database configurations
-HOST = 'http://10.0.2.2/'
+HOST = '127.0.0.1'
 DATABASE = 'techcrunch_cp_2'
 USER = 'root'
 PASSWORD = 'newpass'
